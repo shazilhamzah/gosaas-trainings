@@ -1,0 +1,11 @@
+platform for building, running and shipping applications
+app works on 1 machine but not on other because software mismatch, file missing or version mismath
+dockers fix this as it has a full package
+one app might run on node14 and other on node9 in same machine
+every dependency is isolated
+
+container vs vm
+- vm runs on hypervisor and it is a completely new OS utilizing resources of our system and it is completely isolated, problems: slow to start, full blown OS, resource intensive
+- lightweight, all share OS, start quickly, multiple apps in isolation, less hardware resources
+
+docker architecture

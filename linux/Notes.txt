@@ -1,0 +1,110 @@
+Linux = kernel of Linux distributions, UNIX like OS kernel, made by Linus torvalds
+GNU's = GNU's not unix, provide essential tools and libraries to interact with the computer
+kernel = directly talks to hardware
+
+distributions are for different type of users (ubuntu, kali, Debian, redhat (business) etc.)
+ubuntu = desktop, server, core
+
+
+=== DESKTOP ENVIRONEMNT ===
+blah blah blah basic thingies blah blah blah
+
+=== TERMINAL ===
+useraccount@systemname:~$ (~ means current user's home directory root/home/username, $ means ur logged in as standard non-root user, / means root directory)
+absolute path: from root, relative path: assumed path for some operation acting as a shortcut
+putting . at the beginning of a file name '.file.txt' makes it a hidden file
+
+commands:
+`man command` - an interface to system reference manuals
+`pwd` - present working directory
+`ls -a` - show all files including hidden
+`ls -l` - alot more info, when created, permissions, owner, groups, size in bytes etc.
+`ls -la` - both
+`ls -lah` - size in KBs etc.
+`mkdir -p test` - do not give error if directory already exits
+`rmdir -p` - remove a non empty directory
+
+
+=== WORKING WITH FILES ===
+files are case sensitive
+everything is a file including directories
+while doing ls -la, apparently it shows these 2 files at the top:
+. is the relative reference for the current directory - active workspace - path can be seen by pwd
+.. is the relative reference for the parent directory - container holding workspace - path can be seen by cd .. && pwd
+
+commands:
+`file README.md` - tells the file format (text, image etc.) and properties
+`touch filename` - create file
+`rm -i filename1 filename2` - give confirmation prompt before removing each file
+`rm -rf filename or directoryname` - force remove
+`cp file-beingcopied file-copy`
+`cp -r file-beingcopied file-copy` - recursive copy, directory and all files within it
+`mv file1.txt file2.txt` - rename file1.txt to file2.txt
+`mv file1.txt test/file2.txt` - cuts file1.txt from pwd and moves it in test/file2.txt
+
+
+
+=== WORKING WITH FILE CONTENT ===
+
+
+commands:
+`head -5 filename` - returns first part 5 lines (10 lines if not specified) of files
+`tail -5 filename` - returns last part 5 lines (10 lines if not specified) of files
+`cat filename` - all content of file
+`echo The > text1.txt` - creates and write The in text1.txt
+`cat > file1.txt` - create and add text in file1.txt, do ctrl+D to exit edit mode
+`cat file1.txt > file2.txt` - copy file1 to file2
+`more filename` - shows page by page
+`less filename` - shows line by line
+
+
+=== FILE STRUCTURE ===
+- bin = contains most binary files (cd, mkdir etc.)
+- boot = contains file for booting up the VM and grub (standard bootloader for most Linux distributions, It loads when you power on your computer, allowing you to select your preferred operating system (for dual-boot setups), choose different Linux kernels, or enter recovery mode)
+- dev = physical devices mounted are stored here, disks etc. sometimes cdroms are also stored here
+- etc = config files of installed apps (MySQL, apache etc.)
+- home = all username folders
+- lib = contain binaries needed for program to work
+- media = mounting removable media e.g. usb devices added etc.)
+- mount = process or placeholder folder for mounting drives
+- opt = optional software for system
+- proc = processes folder in files
+- root = home directory for root account
+- run = devices are auto-mounted, mostly works with desktop environment
+- sbin = similar to bin but contain certain commands used by root user
+- tmp = temporary files and removed if we shutdown
+- usr = contains read only files accessible to all users, shared libs and stuff
+- var = variables etc. (log files, server locations etc.)
+- swapfile = when RAM is full, the operating system moves inactive or less frequently used data to the swapfile on harddisk to free up space for active processes
+
+
+=== SYSTEM INFO ===
+commands:
+`uptime`
+`free` - memory usage
+`ps` - snapshot of all processes
+`df -h` - disk space in readable format
+`sudo fdisk -l` - see disk partitioning table
+`lsblk -l` - list blocked devices
+`top` - display Linux processes
+`htop` - a better representation of top
+
+
+=== NETWORKING ===
+commands:
+`ifconfig` = ip info, network device etc.
+`ip a` = new version of ifconfig
+
+=== PACKAGE MANAGER ===
+apt = advanced package management tool
+for ubuntu
+
+command: 
+`sudo apt update` = updates cache of available packages in Linux repo, tells if u have update
+`sudo apt upgrade` = upgrade packages
+`sudo apt search gimp` - find available or installed packages
+`sudo apt remove gimp`
+
+
+=== TEXT EDITOR ===
+nano, nvim

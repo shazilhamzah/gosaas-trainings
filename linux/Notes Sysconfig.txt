@@ -1,0 +1,203 @@
+bios (basic io system) vs uefi (unified extensible firmware interface): bios old and uefi new
+grub vs grub2: new and old, grub has menu.lst grub.conf while grub2 has grub.cfg only... grub2 can do ISO files and stuff
+grub is at /etc/default/grub
+sudo update-grub
+bios = the essential firmware on a motherboard that starts your computer. When you press the power button, the BIOS wakes up the hardware, conducts diagnostic tests, and hands control over to the operating system.
+
+linux can be boot using hardware (usbs etc.) or software (iso files)
+pxe (preboot exec env), we can use to download linux from web instead of some usb
+
+starting a linux kernel
+bios/uefi -> grub/2 -> base kernel -> full kernel
+
+kernel panicks: faulty hardware (overclocked cpu, bad ram etc.), system updates (use some old kernel to fix it)
+
+
+if u wanna add a module at boot startup, add it in /etc/modules file... e.g. e1000 for intel network adapter
+to put module in a blacklist, put it in /etc/modprobe.d/blacklist
+
+insmod is bad program for adding modules as it takes path and stuff and no dependencies and fail with no explanation
+modprobe is good cz it takes name, has dep and needs a map (it is a cover over insmod)
+
+to see kernels installed, cd /lib/modules
+u can run a module using sudo modprobe mdio(or any module name inside kernel)
+
+=== NETWORK ===
+if internet not working:
+check cable
+try pinging
+ping google public dns (8.8.8.8)
+check local network pinging
+
+network tools: ping, dig dnsip targetip (dns packet infos), nslookup (simpler version of dig), host
+
+
+common files in Linux:
+/etc/hosts: local dns file
+/etc/nsswitch.conf: some settings for dns etc.
+/etc/resolv.conf: do not edit this as system edit it itself, it shows what server system is using
+/etc/network/interfaces
+
+
+centos is good for network thingies as it uses a single file
+
+network bonding: combines multiple physical network interfaces (like Ethernet, Wi-Fi, or cellular) into a single logical interface... it has different modes for different type of switches etc.
+
+
+=== STORAGE ===
+there's no D:/ drive, instead it may appear under /mnt/data or /home
+/proc and /sys are not on disk, they're virtual
+
+
+organizing and partitioning data on disk can be done using GPT (guid portioning table) or MBR (master boot record)
+MBR: max 2TB 4 partitions... has a TOC at start that tells how partitions are made (/dev/sda,sda1,sda2...)
+GPT: >2TB 128 paritions... TOC has copies at different places... gpt is new and better
+
+tools to manage partitions: gparted (gui), parted
+
+everything is a file and folder, usb mounted appears as file or folder, disks appear as file or folders etc.
+u can do disk partitioning using fdisk command, select disk from /dev directory
+
+there are different type of file systems:
+common ones are ext, xfs, btrfs, dos... ext4 is the best one but might depend on use
+after making a partition, we have to format it with a filesystem as partition by default is blank
+mkfs.ext4 /dev/sdb1 (e.g. in case where we have made partition of sdb as sdb1)
+
+
+Partitioning => Formatting => Mounting
+
+mounting: to use a partition, we have to mount it somewhere
+mounting means dedicate a partition to some folder
+mount /dev/sdb1 /mnt/mydata
+umount /mnt/mydata
+if we reboot, this will be lost
+so add it in /etc/fstab
+/dev/sdb1   /mnt/mydata   ext4   defaults   0 2
+
+LVM
+Traditional partitions are fixed. You give /home 100GB, it fills up, you're stuck — you can't just "grow" it without unmounting, deleting, recreating, and hoping the adjacent space is free.
+LVM adds an abstraction layer between physical disks and the filesystem. You stop thinking in terms of "partitions on disk X" and start thinking in terms of a shared pool of storage you can slice however you want — and resize later.
+
+Physical Disks
+     ↓
+Physical Volumes (PV)   ← LVM claims these disks/partitions
+     ↓
+Volume Group (VG)       ← PVs pooled together into one big storage pool
+     ↓
+Logical Volumes (LV)    ← slices from the pool — these are what you format and mount
+
+
+RAID (Redundant Array of Independent Disks) combines multiple physical drives into one logical unit
+kind of, i mean kind of load balancing shit
+Physical Drives → RAID (redundancy) → LVM on top (flexibility)
+raid can be hardware but theres a software for this as well
+
+
+=== installation ===
+tarball, Debian
+apt (best), aptitude, apt-get
+sudo dpkg -i file.deb
+install rpm files using yum
+you can add your own or 3rd party (e.g. opera browser) repos in /etc/apt/sources.list
+
+
+
+=== USERS ===
+useradd -d /home/username -s /bin/bash username
+password username
+ssh username@localhost
+userdel -r username
+adduser username (best way)
+
+groupadd name
+groupdel name
+groups username
+usermod -a -G name username
+whoami
+who
+
+u can add quotas on users
+we can set soft and hard limit quota on number of files or number of blocks
+system runs .bashrc for user once it logins
+
+
+=== files ===
+grep -F string file
+cat file | grep -F string
+grep -F string < cat file (same thingy)
+ls > results.txt
+ls ff 2>error.txt
+if u dont wanna see anything in cmd, put it in /dev/null
+cat file.txt | tee copy.txt
+cat file.txt | xargs mkdir (if file.txt has red,green,yellow in each line, it will create folders under these names)
+sort file.txt
+wc file.txt 
+cut -c 3,4,5 file.txt (3rd,4 and 5th character of each line of file.txt)
+sed = stream editor
+
+soft link = pointer to file's path, if it breaks, dangling pointer, hard link = mirror of file's data on disk, points to inode
+
+search file in cache using locate filename... if not in cache, add in cache using sudo updated
+
+scp user:/home/path/file . (copy from user to current directory using ssh)
+rsync -av user:/home/path . (recursive files copy)
+
+
+
+
+=== services ===
+enabled service meaning it will start on reboot
+runlevels = 0-6 (halt, single user, multiuser etc.) - it was in old Linux
+boottarget = newer version (poweroff, rescue, multiuser, graphical, reboot)
+services are in /etc/init.d in sysv
+individual services = ssh, config client, docker etc.
+centralized services = dhcp, dns, config management etc.
+both = ntp etc.
+
+if u wanna make dns, dhcp etc. in different servers, that will be expensive
+if u put them in same server, that will be Single point of failure
+here virtualization comes in, sprawl potential
+
+
+`systemctl status servicename`
+`systemctl enable servicename`
+`systemctl start servicename`
+`chkconfig --list sshd` = check what sshd service does at each run level
+
+
+
+=== server rules ===
+server has a ssl certificate
+self signed certificate (accept if its on local and u trust it, otherwise dont)
+u can manage users using NIS, openLDAP etc. but active directory is the best way
+u can monitor a server using syslog or snmp (to pull data (usually stats) from individual devices)
+u can log device logs like printer, cameras etc. on a central server
+vpn = connect to a private network which isn't accessible through internet through a tunnel
+cluster is like an actual server trying to redirect traffic, servers in cluster know about each other and they work as a team.... load balancer doesn't know other systems init, they just split the tasks
+
+
+
+=== cron jobs ===
+minute, hour, day of month, month, day of week
+/etc/cron.d
+add cron jobs in /etc/cron.d/sysstat
+
+add & at the end of command e.g. sleep 1111 & to bring it in the background
+to bring it in foreground, do fg jobnumber
+`jobs`
+`nohup job` - this will not close the job if user logs out
+
+
+
+=== local devices ===
+`demesg` = show all devices attached or plugged in
+`lsblk` = show blocked devices
+`lscpu` = cpu info
+`lsdev` = what memory parts all devices are using
+`lspci` = all pci devices, devices that are directly attached to the motherboard, network cards etc.
+`lsmem` = memory info
+
+sys, dev, proc folders are confusing because Pehle everything was in proc including processes and kernels etc., but then they decided to put new upcomign kernel thingies in sys and seperated after, so old thingies remained in proc and new thingies went into sys... its organized but not that organized
+
+u can do printing and stuff using lpr and lpq etc. and using web-based CUPS app
+we can make rules when some device is attached

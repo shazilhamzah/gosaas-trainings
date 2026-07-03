@@ -1,0 +1,462 @@
+computer asks dbms which changes manipulate db
+
+sql for relational db... tables and relations between tables
+
+
+
+AS for alias, DISTINCT for unique columns
+
+
+
+AND has higher precedence than OR
+
+
+
+WHERE country IN ('PK','IN','US')
+
+
+
+WHERE points BETWEEN 100 AND 300
+
+
+
+WHERE last\_name LIKE '%b%' (% means anything, 0 or more characters)
+
+WHERE last\_name LIKE '\_\_\_\_\_b' (total 6 chars and end with b)
+
+
+
+WHERE last\_name REGEXP 'b' (same shit as %b%)
+
+^ = beginning of string (^field means name must begin with field)
+
+$ = end of string (field$ means name must end with field)
+
+| = OR (field|mac searches for both)
+
+\[] = any character from these brackets (\[gim]e searches for either g or i or m followed by an e, similary \[a-h]e means anything from a to h followed by an e)
+
+
+
+IS NULL or IS NOT NULL
+
+
+
+ORDER BY state DESC, first\_name DESC
+
+
+
+SELECT firstname,lastname FROM customers ORDER BY 1,2 (means order by first and last name)
+
+
+
+ORDER BY quantity\*price DESC
+
+
+
+LIMIT 3 means pick top 3
+
+LIMIT 6,3 means skip 6 and then show next 3
+
+
+
+explicit join syntax:
+
+SELECT \* FROM customer c
+
+JOIN order o
+
+ON c.id=o.id
+
+
+
+implicit join syntax:
+
+SELECT \* FROM customer c, order o WHERE o.id=c.id
+
+if u forget where clause, it will give cross join
+
+
+
+outer join can be left or right... if u want customers with null order, use outer join
+
+left join show all values of left table whether ON condition is true or not
+
+right join show all values of right table whether ON condition is true or not
+
+
+
+if we have same column name in two tables being joined, we can use USING clause
+
+SELECT \* FROM customer JOIN order USING (id)
+
+
+
+use NATURAL JOIN for auto joining without specifying column name
+
+
+
+S
+
+CROSS JOIN -> every record from first table to every record of 2nd table (no condition)
+
+
+
+UNION does vertical stacking of rows and it is used between two SELECT statements
+
+SELECT \* FROM table WHERE abc UNION SELECT \* FROM table WHERE def
+
+no of columns in both select should be same otherwise error and it takes column name from 1st select statement
+
+if u do order by at the end, it is applied on whole final table
+
+
+
+
+
+char is static (50 means 50) while varchar is dynamic (max 50)
+
+
+
+====
+
+
+
+====
+
+
+
+
+
+numeric functions
+
+ROUND(5.73,1) = 5.7, TRUNCATE(5.731,1)=5.7, CEILING, FLOOR, ABS() = positive value, RAND()
+
+
+
+string functions
+
+LENGTH(), UPPER(), LOWER(), LTRIM('   sky')=sky, RTRIM(), TRIM(), LEFT('kindergarten',4)=kind, RIGHT(), SUBSTRING('abcde',2,4)=bcde, LOCATE('n','kindergarten')=3, REPLACE('kindergarten','garten','garden')=kindergarden, CONCAT('ab','cd')=abcd
+
+
+
+Date and time functions
+
+NOW(), CURDATE(), CURTIME(), YEAR(NOW()), month, day,hour, minute, second, DAYNAME(), MONTHNAME(), EXTRACT(DAY FROM NOW()), DATE\_FORMAT(NOW(),'%m %d %Y), TIME\_FORMAT(NOW(),'%h')
+
+DATE\_ADD(NOW(), INTERVAL 1 YEAR), DATE\_SUB(), DATEDIFF(date1,date2), TIME\_TO\_SEC()=seconds elapsed till midnight
+
+
+
+SELECT IFNULL(shippedid,'Not Assigned') FROM orders
+
+SELECT COALESCE(shippedid,comments,'Not Assigned'), if shippedid null, check comments if that also null than not assigned
+
+SELECT IF(YEAR(order\_date)=YEAR(NOW())), 'Active','Not active') FROM orders
+
+SELECT CASE
+
+&#x09;WHEN YEAR(order\_date)=YEAR(NOW()) THEN 'active'
+
+&#x09;WHEN YEAR(order\_date)=YEAR(NOW()) - 1 THEN 'last year'
+
+&#x09;WHEN YEAR(order\_date)<YEAR(NOW()) THEN 'archived'
+
+&#x09;ELSE 'Future'
+
+FROM orders
+
+
+
+CREATE VIEW viewname AS select statement
+
+we can treat a view as a table as well
+
+DROP VIEW viewname
+
+CREATE OR REPLACE VIEW viewname AS ...
+
+a view is updatable if we dont have DISTINCT, aggregate funcs, groupby or union in the select statement... we can update rows or delete rows etc. like a regular table
+
+while updating a row in a view, some rows might disappear... to stop updating rows that will result in disappearance of a row, CREATE VIEW viewname AS select statement WITH CHECK OPTION 
+
+e.g. if views has WHERE dept='HR' in it, trying inserting dept='IT' will result in vanishing row
+
+views can reduce impact of changes, restrict access to the data
+
+
+
+
+
+stored procedures used for organize SQL, faster exec, security
+
+DELIMETER $$ -- change statement end to $$
+
+CREATE PROCEDURE get\_clients(p\_state CHAR(2))
+
+BEGIN 
+
+&#x09;IF state IS NULL SET state='CA' ; END IF;
+
+&#x09;SELECT \* FROM clients c WHERE c.state=p\_state;
+
+END$$
+
+DELIMETER ; -- change back to a semicolon
+
+CALL get\_clients('CA')
+
+DROP PROCEDURE IF EXISTS get\_clients
+
+parameter validation using IF amount<=0 THEN SIGNAL SQLSTATE '22003' SET MESSAGE\_TEXT='invalid payment amount'; END IF;
+
+define output params in () as OUT count INT and return using SELECT count(\*) INTO count FROM table... while calling, send them using @count in () and values will be updated.
+
+to make local vars, after BEGIN, DECLARE risk\_factor INT; 
+
+
+
+function can only return 1 value
+
+CREATE FUNCTION get\_risk\_factor(id INT)
+
+RETURNS INT
+
+DETERMINISTIC -- same output for same input
+
+READS SQL DATA -- if u have select statement in function
+
+MODIFIES SQL DATA
+
+BEGIN
+
+&#x09;-- inits
+
+&#x09;--logic
+
+&#x09;RETURN risk\_factor;
+
+END
+
+
+
+trigger is sql code that gets exectuted before or after insert, update or delete to enforce data consistency
+
+CREATE TRIGGER payments\_after\_insert
+
+&#x09;AFTER INSERT ON payments
+
+&#x09;FOR EACH ROW
+
+BEGIN
+
+&#x09;UPDATE invoices 
+
+&#x09;SET payment\_total = payment\_total + NEW.amount
+
+&#x09;WHERE invoice\_id = NEW.invoice\_id;	
+
+END
+
+SHOW TRIGGERS --view triggers
+
+to do auditing, put these changes in a new table and add current date etc.
+
+
+
+events is a task that gets executed according to some schedule
+
+CREATE EVENT yearly\_something
+
+ON SCHEDULE
+
+&#x09;-- AT 'some date' or
+
+&#x09;EVERY 1 year STARTS some data ENDS some date
+
+DO BEGIN
+
+&#x09;something;
+
+END
+
+ALTER EVENT yearly\_something DISABLE;
+
+
+
+transactions = statements that represent single unit of work
+
+acid = atomicity, consistency, isolation (diff transactions are isolated), durability (perm changes)
+
+```
+
+START TRANSACTION
+
+insert into order;
+
+insert into order\_items;
+
+COMMIT;
+
+each statement in SQL is by default a transaction
+
+concurrency=multiple users accessing some data at same time... to handle this, mysql puts a lock on it
+
+lost updates = later transaction overwrite previous transaction
+
+dirty reads = A update but doesnt commit yet but B reads old value... to fix this we use isolation level READ COMMITED so that it only read commited data
+
+non-repeating inconsistent reads = A reads 10 first and B updates it to 0 and subquery of A reads 0 which is wrong... to fix this we use isolation level REPEATABLE READ to read same data everywhere in a transaction
+
+phantom reads = A selects some data but a new entry appears after that read... to fix this we use isolation level SERIALIZABLE, this makes sure transaction is aware of all changes in the data... this can hurt performance
+
+SET SESSION/GLOBAL TRANSACTION ISLOATION LEVEL SERIALIZABLE;
+
+deadlock = transactions keep waiting for each other and never release a lock
+
+in following statements deadlock can occur: 
+
+START TRANSACTION UPDATE orders; UPDATE customers; COMMIT;
+
+START TRANSACTION UPDATE customers; UPDATE orders; COMMIT;
+
+
+
+
+
+data types = numeric, string, date, blob, spatial
+
+string = char, varchar (max is 65535), mediumtext (16MB max), longtext (max 4GB), TINYTEXT (255B), TEXT (64KB)
+
+numeric = tinyint (1B, -128-127), smallint, bigint, mediumint etc. decimal(9,2)=total 9 and 2 after decimal, dec, numeric, fixed, float, double
+
+boolean = TRUE or FALSE
+
+enums = ENUM('Small','Medium','Large')... expensive if we change enum, sql drops whole table and redefine... use a seperate size lookup table instead
+
+datetime = DATE, TIME, DATETIME (8b - use if year is above 2038), TIMESTAMP (4b), YEAR
+
+blob = TINYBLOB, BLOB, MEDIUMBLOB, LONGBLOB... dont really store blobs in db
+
+json = js object notation - keyvalue pairs - UPDATE Products SET Properties = {'weight':10} WHERE id=1; SELECT id, properties -> '$weight' FROM Products;
+
+
+
+
+
+data modelling = understand requirements
+
+build a conceptual model (concepts in buisness and relations with each other e.g. students and course in flex - use ER or UML)
+
+logical model (ind. of technology and tells how to store data - add datatypes in ER tables, add relationships 1-1 1-\* etc. - add relationship tables like enrollment table between student and course)
+
+physical model (in some technology, implement in mysql)
+
+FK constraints = no action, restric, set null, cascade
+
+normalization = to remove redundant or duplicated data
+
+1nf = each self have single value and no repeated columns (tag1,tag2 etc. instead make a tags table)
+
+2nf = 1nf and each table describe one entity and every column describe that entity e.g. order id storing customer name is not good, instead use customer id so that name is not repeated
+
+3nf = 2nf and a column in table should not be derived from other columns
+
+build model on current requirements, not very far future requirements
+
+forward engineer = model to db
+
+u can synchronize model and db
+
+reverse engineer = db to model
+
+
+
+ALTER TABLE customers ADD last\_name VARCHAR(50) AFTER first\_name;
+
+ALTER TABLE customers MODIFY COLUMN first\_name VARCHAR(55) DEFAULT '';
+
+ALTER TABLE customers DROP first\_name;
+
+CREATE TABLE Orders (orderid INT, customerid INT, FOREIGN KEY fk\_orders\_customers (customerid) REFERENCES CustomersTable (customerid) ON UPDATE CASCADE ON DELETE CASCADE);
+
+ALTER TABLE Customers ADD FOREIGN KEY ....;
+
+
+
+character set = table that maps characters to numeric presentations (utf8, 32 etc.) if we do char(10) in utf 8, it will reserve like 10\*3\*1 million bytes for 1 million entries but we only wanna store latin ones that take 1B per character so in that scenario we will change the character set. default is utf8.
+
+CREATE/ALTER DATABASE dbname CHARACTER SET latin1; -- also works on table level or column level
+
+
+
+storage engines = determine how data is stored and which features are available in mysql. famous ones are innodb and myISAM
+ALTER TABLE customers ENGINE = InnoDB
+
+
+
+indexing = sort by some column of table in memory and add a pointer from each entry of that sorted data to each entry on disc. design index on queries, not on columns e.g. if most queries have WHERE state = 'something', index on state. index are stored in binary trees or B-Trees.
+
+more indexes u have, more write delay.
+
+CREATE INDEX idx\_state ON Customers(state);
+
+SHOW INDEXES IN Customers;
+
+cardinality = no. of unique values in index. it should be high
+
+ANALYZE TABLE Customers; -- show all indexes
+
+mysql auto creates indexes on FK to quickly do joining stuff
+
+prefix indexes = take few fixed number of characters from first or last name
+
+full text index = used in search engines, unlike standard indexes that check exact matches, it break down text into tokens and build inverted index
+
+CREATE FULLTEXT INDEX idx\_title\_body ON posts (title, body);
+
+SELECT \* FROM posts WHERE MATCH(title,body) AGAINST('react redux');
+
+SELECT MATCH(title,body) AGAINST('react redux'); -- returns relevancy scores as well
+
+SELECT MATCH(title,body) AGAINST('react -redux +form' IN BOOLEAN MODE); -- react but not redux and must include 'form'
+
+
+
+composite indexes: CREATE INDEX idx\_state\_points ON customers (state,points);
+
+my sql allows 16 columns max in composite index.
+
+rule1: put the most frequent columns must come first - rule2: high cardinality must come first
+
+if we have WHERE state='something' OR points=1000, index might not work, instead create seperate indexes for both state and points and union two select statements... similarly performing arithematic operations such as points+10=2010 can result in low performance, instead do points=2000
+
+
+
+we can use indexes for sorting data.
+
+if we have composite index (a,b) we can sort a alone, a and b, a DESC and b DESC. But we cant sort b only cheaply.
+
+covering index =  an index which contains all the columns required to satisfy a query... index automatically always include the PK
+
+do not create duplicate indexes (a,b) and (a,b)
+
+do not create redundant indexes like (a,b) and a or (b,a) and b
+
+
+
+CREATE USER john@127.0.0.1 IDENTIFIED BY 'password';
+
+SELECT \* FROM mysql.user;
+
+DROP USER john@127.0.0.1;
+
+SET PASSWORD FOR john='newpassword';
+
+GRANT SELECT, INSERT, UPDATE, DELETE, EXECUTE ON sql\_store.\* TO john@127.0.0.1;
+
+GRANT ALL ON \*.\* TO john@127.0.0.1;
+
+SHOW GRANTS FOR john@127.0.0.1;
+
+REVOKE INSERT UPDATE ON sql\_store.\* FROM john@127.0.0.1;
