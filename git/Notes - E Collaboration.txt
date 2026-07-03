@@ -1,0 +1,19 @@
+origin is the reference to the repo on GitHub
+
+when we git fetch, origin/master and origin/head moves ahead but our local stays there... master is behind one commit... u can see that using git branch -vv
+
+when divergent branches, git pull fetches the code and also merges the local commits over it... u can also use rebase instead, both are okay... this will make local master one commit ahead of origin
+
+dont push code aese hi, first pull code, merge and see if any conflicts are there and then push
+
+tag doesn't push automatically, u have to specify using git push origin tagname
+to delete a tag from hub repo, use git push origin --delete tagname, it doesn't delete tag from local repo
+
+by default if we create a new branch, GitHub repo tracker (origin) is not on that branch, to do that, u have to push that branch first
+
+if u fetch, local branch isn't created although tracking is created... u can do that using git switch -C branchname origin/branchname
+
+milestone is used to store milestones LOL... as you complete issues, milestones get more and more % completed.
+
+if u fork a repo and original repo changes, ur forked repo doesn't get updated automatically. to do that manually, u have to add a remote from local git to original repo, pull it and push it on forked repo.
+git remote add upstream github.com/actual_repo.git... here, u can change upstream to any other name, it is just a pointer to that link	

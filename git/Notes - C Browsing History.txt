@@ -1,0 +1,23 @@
+git log --oneline --stat (to see files changed along with commit history)
+git log --oneline --patch (to see file changes along with commit history)
+
+we can also apply filters to filter out logs
+
+u can also format the log output using --pretty=format:""
+
+u can create alias of any command using config --global alias.<alias> "<command>"
+
+master is the most recent commit and head points to current working commit... if we go to some else commit using git checkout, head is detached from master... u should not create a commit at detached head otherwise it will be unreachable
+
+u can divide the commits to find out where issues were introduced using git bisect
+
+u can also see the members who created commits and shit using git shortlog
+
+
+u can see all the file changes of a specific file in all previous commits using git log filename
+
+if u delete a file, u cant see the old commits of it unless u use -- before that file name. git log -- filename
+
+blame tool tells who wrote a line of code: git blame filename
+
+u can add tags to commits and refer them using tags. u can create them using git lens as well.

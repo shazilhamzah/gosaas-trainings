@@ -1,0 +1,39 @@
+branch = seperate isolated workspace
+
+create a branch using git branch branchname
+go to a new branch using git switch branchname
+rename using git branch -m oldname newname
+
+delete a branch using git branch -d tag. force delete using -D
+
+get comparison using git diff branch1..branch2
+
+git doesnt allow branch switching without commit because otherwise changes will be lost. We can either git stash push -m "message" (storing it somewhere but it will not show in history) or commit. We can add multiple stashes and get them using git stash list.
+git stash show 1
+git stash apply 1 (to merge with maste)
+git stash drop 1
+
+
+if theres a direct linear path from target branch to source branch, just bring pointer of source branch to target branch... this is fast forward merging
+for diverged branch (changes made in both master and bugfix), make new commit that combines changes from both source and target branch... it compare the common ancestor of 2 branches
+
+fast forward using git merge branchname
+even if ff is possible, u can merge files in other way using git merge --no-ff branchname
+
+to abort merge conflicts, do git merge --abort... this pushes code to the state before starting the merge
+
+git reset => move the head to one back before merge
+resetting can be soft, mixed or hard
+soft => HEAD will move only but staging area and cwd will not change
+mixed => (default) HEAD will move and staging area is also updated, cwd remains same
+hard => everything changes yippppeeeee
+use git reset for local-only history changes, and use git revert to undo changes on a shared branch safely
+
+squash merging = merge nodes of the same branch
+
+rebasing can change the position or base where merge is going to take place to make it a fast forward linear merge... rebasing rewrite history
+
+cherrypicking = chose one of the commits of a branch to commit over master and not merge the whole branch yet. 
+git cherry-pick commitid
+
+you can pick up a file from another branch in your cwd using git restore --source=branchname -- filename

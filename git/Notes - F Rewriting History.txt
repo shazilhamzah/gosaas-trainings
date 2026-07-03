@@ -1,0 +1,32 @@
+we write history to make it clean and that tells a story
+
+golden rules of rewriting history:
+dont rewrite public history, people have to pull and then merge and then push which will create a non linear history which is not really good muehehehehhe
+
+no order of things, dependent things first and then independent things etc. are examples of bad history
+
+if we have already pushed a commit, we can do git revert HEAD and if it is local, we can do git reset --hard HEAD~1
+
+reset just moves head pointer while revert cancel out changes of older commits... if pushed, move the head pointer first and then revert using --no-commit
+git reset --hard HEAD~3
+git revert --no-commit HEAD~3..
+git revert --continue
+
+if we move our head to older commit, it doesn't show newer commits in git log... to see them, we use git reflog
+
+we can edit a commit using git commit --amend, it will amend last commit... (it shows that it edited it but in backend, it creates a new one and discards old)
+we can remove a file from a commit using git reset --mixed HEAD~1 and then git clean filename and then commit again.
+
+to amend an earlier commit, do git rebase -i commitid, add command, make changes, and then git commit --amend and then git rebase --continue, it will destroy all the old nodes and create new ones because of linkedlist logic
+
+u can drop and old commit using same way, instead there will be drop command... if merge conflict occurs, fix it using git mergetool
+
+if u wanna change commit message, use reword command in interactive mode
+
+if u wanna reorder commits, just move lines in rebase interactive mode
+
+if u wanna squash 2 or more commits in a single commit, use squash command... they should be next to each other, if they are not, reorder them first
+
+if u wanna split a commit, start with interactive rebase, use edit command on the commit u wanna split... do git reset --mixed HEAD^, make changes (if u want) and commit, make another commit and then continue rebase.
+
+its all easy shit using git kraken
